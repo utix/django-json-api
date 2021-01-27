@@ -5,7 +5,7 @@ import requests
 
 from django.conf import settings
 
-from swlibs.json_api.fields import get_model, Relationship
+from django_json_api.fields import get_model, Relationship
 
 
 Fields = Dict[str, List[str]]

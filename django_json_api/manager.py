@@ -1,7 +1,7 @@
 from copy import deepcopy
 from typing import Iterator, List, Union
 
-from swlibs.json_api.client import JSONAPIClient
+from django_json_api.client import JSONAPIClient
 
 
 class JSONAPIManager:

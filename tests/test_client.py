@@ -3,9 +3,9 @@ from urllib.parse import urlencode
 import requests_mock
 import pytest
 
-from swlibs.json_api.client import JSONAPIClient, JSONAPIClientError
+from django_json_api.client import JSONAPIClient, JSONAPIClientError
 
-from tests.swlibs.json_api.models import DummyRelated  # pylint: disable=unused-import
+from tests.models import DummyRelated  # pylint: disable=unused-import
 
 
 # pylint: disable=redefined-outer-name

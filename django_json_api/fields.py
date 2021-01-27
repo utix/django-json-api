@@ -7,7 +7,7 @@ def is_identifier(value):
 
 def get_identifier(value):
     # pylint: disable=import-outside-toplevel,cyclic-import
-    from swlibs.json_api.models import JSONAPIModel
+    from django_json_api.models import JSONAPIModel
     if is_identifier(value):
         return value
     if isinstance(value, JSONAPIModel):
@@ -17,7 +17,7 @@ def get_identifier(value):
 
 def get_model(resource_type):
     # pylint: disable=import-outside-toplevel,cyclic-import
-    from swlibs.json_api.models import JSONAPIModel
+    from django_json_api.models import JSONAPIModel
     for klass in JSONAPIModel.__subclasses__():
         if klass._meta.resource_type == resource_type:
             return klass

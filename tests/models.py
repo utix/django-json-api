@@ -1,5 +1,5 @@
 from django.db.models import Model
-from swlibs.json_api import django, fields, models
+from django_json_api import django, fields, models
 
 
 class Dummy(models.JSONAPIModel):

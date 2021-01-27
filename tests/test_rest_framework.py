@@ -5,9 +5,9 @@ from rest_framework.serializers import BaseSerializer
 from rest_framework_json_api.utils import get_included_serializers
 from django.test import TestCase
 
-from swlibs.json_api.rest_framework import ModelSerializer, get_default_relation_serializer
-from swlibs.json_api.client import JSONAPIClientError
-from tests.swlibs.json_api.models import DummyModel, DummyRelated
+from django_json_api.rest_framework import ModelSerializer, get_default_relation_serializer
+from django_json_api.client import JSONAPIClientError
+from tests.models import DummyModel, DummyRelated
 
 
 class DummySerializer(ModelSerializer):
