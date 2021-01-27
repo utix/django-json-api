@@ -7,8 +7,8 @@ from rest_framework_json_api.utils import (
     get_resource_type_from_serializer,
 )
 
-from swlibs.json_api import django, fields
-from swlibs.json_api.client import JSONAPIClientError
+from django_json_api import django, fields
+from django_json_api.client import JSONAPIClientError
 
 MAPPING = {
     fields.DateTimeAttribute: serializers.DateTimeField,

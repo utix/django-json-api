@@ -3,7 +3,7 @@ from typing import Any, List, Dict, Optional, Type, Union
 
 from django.core.cache import cache
 
-from swlibs.json_api.base import JSONAPIModelBase
+from django_json_api.base import JSONAPIModelBase
 
 
 # pylint: disable=no-member

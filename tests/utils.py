@@ -3,7 +3,7 @@ from unittest import mock
 
 def mock_json_api(target):
     target.patcher = mock.patch(
-        'swlibs.json_api.manager.JSONAPIManager',
+        'django_json_api.manager.JSONAPIManager',
         spec=True)
 
     setup_fn = target.setUp

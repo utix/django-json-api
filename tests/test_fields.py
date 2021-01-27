@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from unittest import mock
 
-from swlibs.json_api.fields import (
+from django_json_api.fields import (
     get_model,
     is_identifier,
     Attribute,
@@ -11,7 +11,7 @@ from swlibs.json_api.fields import (
     RelationshipDescriptor)
 
 
-from tests.swlibs.json_api.models import Dummy, DummyRelated
+from tests.models import Dummy, DummyRelated
 
 
 # pylint: disable=no-member,redefined-outer-name,attribute-defined-outside-init
@@ -154,7 +154,7 @@ def test_relationship_descriptor_single_get_refresh_from_api():
 def test_relationship_descriptor_single_get():
     relation = Relationship(many=False)
     relation.contribute_to_class(EmptyClass, 'relation')
-    with mock.patch('swlibs.json_api.fields.get_model') as get_model:
+    with mock.patch('django_json_api.fields.get_model') as get_model:
         instance = EmptyClass()
         instance.relation_identifier = {'id': '42', 'type': 'tests'}
         assert instance.relation == get_model.return_value.objects.get.return_value
@@ -167,7 +167,7 @@ def test_relationship_descriptor_single_get():
 def test_relationship_descriptor_many_get():
     relation = Relationship(many=True)
     relation.contribute_to_class(EmptyClass, 'relation')
-    with mock.patch('swlibs.json_api.fields.get_model') as get_model:
+    with mock.patch('django_json_api.fields.get_model') as get_model:
         instance = EmptyClass()
         instance.relation_identifiers = [{'id': '42', 'type': 'tests'}]
         assert instance.relation == [get_model.return_value.objects.get.return_value]

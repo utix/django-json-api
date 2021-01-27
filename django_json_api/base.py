@@ -1,4 +1,4 @@
-from swlibs.json_api.manager import JSONAPIManager
+from django_json_api.manager import JSONAPIManager
 
 
 class Options:

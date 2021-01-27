@@ -4,9 +4,9 @@ import pytest
 
 from django.test import TestCase
 
-from swlibs.json_api.django import prefetch_jsonapi, WithJSONApiManager
+from django_json_api.django import prefetch_jsonapi, WithJSONApiManager
 
-from tests.swlibs.json_api.models import DummyModel, DummyRelated
+from tests.models import DummyModel, DummyRelated
 
 
 class RelatedJSONAPIFieldTestCase(TestCase):
@@ -73,7 +73,7 @@ def test_prefetch_jsonapi():
 
 @pytest.mark.django_db
 def test_with_jsonapi_manager():
-    with mock.patch('swlibs.json_api.django.prefetch_jsonapi') as prefetch_jsonapi_mock:
+    with mock.patch('django_json_api.django.prefetch_jsonapi') as prefetch_jsonapi_mock:
         related = DummyRelated(pk=12).cache()
         instance = DummyModel.objects.create(pk=42, related=related)
         manager = WithJSONApiManager()

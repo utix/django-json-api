@@ -5,9 +5,9 @@ import pytest
 
 from django.core.cache import cache
 
-from swlibs.json_api.manager import JSONAPIManager
+from django_json_api.manager import JSONAPIManager
 
-from tests.swlibs.json_api.models import Dummy
+from tests.models import Dummy
 
 
 # pylint: disable=protected-access

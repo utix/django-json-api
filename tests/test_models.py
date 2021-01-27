@@ -2,9 +2,9 @@ from unittest import mock, TestCase
 
 from django.core.cache import cache
 
-from swlibs.json_api.models import JSONAPIModel
+from django_json_api.models import JSONAPIModel
 
-from tests.swlibs.json_api.models import Dummy
+from tests.models import Dummy
 
 
 # pylint: disable=no-member
