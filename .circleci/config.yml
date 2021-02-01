@@ -65,6 +65,29 @@ jobs:
       - run:
           name: Run Python Test Suite
           command: python -m pytest
+  run_python_formatter:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Run black check
+          command: python -m black . --check
+  run_python_linter:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Run flake8 check
+          command: flake8 -v ./
+
 
 workflows:
   build_and_test:
@@ -74,5 +97,11 @@ workflows:
           requires:
             - build
       - run_python_tests:
+          requires:
+            - install_python_deps
+      - run_python_formatter:
+          requires:
+            - install_python_deps
+      - run_python_linter:
           requires:
             - install_python_deps
