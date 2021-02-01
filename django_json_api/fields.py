@@ -2,22 +2,22 @@ from dateutil.parser import parse
 
 
 def is_identifier(value):
-    return isinstance(value, dict) and 'id' in value and 'type' in value
+    return isinstance(value, dict) and "id" in value and "type" in value
 
 
 def get_identifier(value):
-    # pylint: disable=import-outside-toplevel,cyclic-import
     from django_json_api.models import JSONAPIModel
+
     if is_identifier(value):
         return value
     if isinstance(value, JSONAPIModel):
-        return {'id': str(value.id), 'type': value._meta.resource_type}
+        return {"id": str(value.id), "type": value._meta.resource_type}
     return None
 
 
 def get_model(resource_type):
-    # pylint: disable=import-outside-toplevel,cyclic-import
     from django_json_api.models import JSONAPIModel
+
     for klass in JSONAPIModel.__subclasses__():
         if klass._meta.resource_type == resource_type:
             return klass
@@ -44,35 +44,32 @@ class RelationshipDescriptor:
     def __get__(self, obj, obj_type=None):
         if obj is None:
             return self
-        if hasattr(obj, f'_{self.field.name}_cache'):
-            return getattr(obj, f'_{self.field.name}_cache')
+        if hasattr(obj, f"_{self.field.name}_cache"):
+            return getattr(obj, f"_{self.field.name}_cache")
         if self.field.many:
-            if not hasattr(obj, f'{self.field.name}_identifiers'):
+            if not hasattr(obj, f"{self.field.name}_identifiers"):
                 obj.refresh_from_api()
             result = [
-                get_model(resource['type']).objects.get(pk=resource['id'])
-                for resource in getattr(obj, f'{self.field.name}_identifiers', [])
+                get_model(resource["type"]).objects.get(pk=resource["id"])
+                for resource in getattr(obj, f"{self.field.name}_identifiers", [])
             ]
         else:
-            if not hasattr(obj, f'{self.field.name}_identifier'):
+            if not hasattr(obj, f"{self.field.name}_identifier"):
                 obj.refresh_from_api()
-            identifier = getattr(obj, f'{self.field.name}_identifier', None)
+            identifier = getattr(obj, f"{self.field.name}_identifier", None)
             result = (
-                get_model(identifier['type']).objects.get(pk=identifier['id'])
+                get_model(identifier["type"]).objects.get(pk=identifier["id"])
                 if identifier is not None
                 else None
             )
-        setattr(obj, f'_{self.field.name}_cache', result)
+        setattr(obj, f"_{self.field.name}_cache", result)
         return result
 
     def __set__(self, obj, value):
         if self.field.many:
-            setattr(
-                obj,
-                f'{self.field.name}_identifiers',
-                list(map(get_identifier, value or [])))
+            setattr(obj, f"{self.field.name}_identifiers", list(map(get_identifier, value or [])))
         else:
-            setattr(obj, f'{self.field.name}_identifier', get_identifier(value))
+            setattr(obj, f"{self.field.name}_identifier", get_identifier(value))
 
 
 class Attribute:

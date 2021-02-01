@@ -10,26 +10,19 @@ from django_json_api.manager import JSONAPIManager
 from tests.models import Dummy
 
 
-# pylint: disable=protected-access
-# pylint: disable=redefined-outer-name
-# pylint: disable=unused-argument
-
-
 PAGES = [
     {
-        'data': [
+        "data": [
             {
-                'id': str(10 * j + i + 1),
-                'type': 'tests',
-                'attributes': {
-                    'name': f'Record #{10 * j + i + 1}',
+                "id": str(10 * j + i + 1),
+                "type": "tests",
+                "attributes": {
+                    "name": f"Record #{10 * j + i + 1}",
                 },
             }
             for i in range(0, 10)
         ],
-        'links': {
-            'next': None if j == 4 else 'http://next'
-        }
+        "links": {"next": None if j == 4 else "http://next"},
     }
     for j in range(0, 5)
 ]
@@ -40,14 +33,14 @@ def pages():
     with Mocker() as mocker:
         for i, page in enumerate(PAGES):
             params = {
-                'include': 'related',
-                'fields[tests]': 'field,related',
-                'page[size]': 10,
-                'page[number]': i + 1,
+                "include": "related",
+                "fields[tests]": "field,related",
+                "page[size]": 10,
+                "page[number]": i + 1,
             }
             mocker.register_uri(
-                'GET',
-                f'http://test/api/tests/?{urlencode(params)}',
+                "GET",
+                f"http://test/api/tests/?{urlencode(params)}",
                 status_code=200,
                 json=page,
             )
@@ -56,39 +49,41 @@ def pages():
 
 def test_jsonapi_manager_sort():
     manager = JSONAPIManager(Dummy)
-    manager_with_sort = manager.sort('field1', 'field2')
-    manager_with_extended_sort = manager_with_sort.sort('field3')
+    manager_with_sort = manager.sort("field1", "field2")
+    manager_with_extended_sort = manager_with_sort.sort("field3")
     assert manager._sort == []
-    assert manager_with_sort._sort == ['field1', 'field2']
-    assert manager_with_extended_sort._sort == ['field1', 'field2', 'field3']
+    assert manager_with_sort._sort == ["field1", "field2"]
+    assert manager_with_extended_sort._sort == ["field1", "field2", "field3"]
 
 
 def test_jsonapi_manager_fields():
     manager = JSONAPIManager(Dummy)
-    manager_with_fields = manager.fields(related=['field1', 'field2'])
-    manager_with_extended_fields = manager_with_fields.fields(other=['field1'])
+    manager_with_fields = manager.fields(related=["field1", "field2"])
+    manager_with_extended_fields = manager_with_fields.fields(other=["field1"])
     assert manager._fields == {}
-    assert manager_with_fields._fields == {'related': ['field1', 'field2']}
+    assert manager_with_fields._fields == {"related": ["field1", "field2"]}
     assert manager_with_extended_fields._fields == {
-        'related': ['field1', 'field2'], 'other': ['field1']}
+        "related": ["field1", "field2"],
+        "other": ["field1"],
+    }
 
 
 def test_jsonapi_manager_include():
     manager = JSONAPIManager(Dummy)
-    manager_with_include = manager.include('related1', 'related2')
-    manager_with_extended_include = manager_with_include.include('related3')
+    manager_with_include = manager.include("related1", "related2")
+    manager_with_extended_include = manager_with_include.include("related3")
     assert manager._include == []
-    assert manager_with_include._include == ['related1', 'related2']
-    assert manager_with_extended_include._include == ['related1', 'related2', 'related3']
+    assert manager_with_include._include == ["related1", "related2"]
+    assert manager_with_extended_include._include == ["related1", "related2", "related3"]
 
 
 def test_jsonapi_manager_filter():
     manager = JSONAPIManager(Dummy)
     manager_with_filters = manager.filter(pk=42)
-    manager_with_extended_filters = manager_with_filters.filter(name='Test')
+    manager_with_extended_filters = manager_with_filters.filter(name="Test")
     assert manager._filters == {}
-    assert manager_with_filters._filters == {'pk': 42}
-    assert manager_with_extended_filters._filters == {'pk': 42, 'name': 'Test'}
+    assert manager_with_filters._filters == {"pk": 42}
+    assert manager_with_extended_filters._filters == {"pk": 42, "name": "Test"}
 
 
 def test_jsonapi_manager_iterator(pages):
@@ -102,39 +97,35 @@ def test_jsonapi_manager_iterator(pages):
 def test_jsonapi_manager_iterator_with_included():
     cache.clear()
     page = {
-        'data': [
-            {
-                'id': '137',
-                'type': 'tests',
-                'attributes': {}
-            },
+        "data": [
+            {"id": "137", "type": "tests", "attributes": {}},
         ],
-        'included': [
+        "included": [
             {
-                'id': '42',
-                'type': 'tests',
-                'attributes': {
-                    'field': 'Included Record',
-                }
+                "id": "42",
+                "type": "tests",
+                "attributes": {
+                    "field": "Included Record",
+                },
             }
-        ]
+        ],
     }
     with Mocker() as mocker:
         params = {
-            'include': 'related',
-            'fields[tests]': 'field,related',
-            'page[size]': 10,
-            'page[number]': 1,
+            "include": "related",
+            "fields[tests]": "field,related",
+            "page[size]": 10,
+            "page[number]": 1,
         }
         mocker.register_uri(
-            'GET',
-            f'http://test/api/tests/?{urlencode(params)}',
+            "GET",
+            f"http://test/api/tests/?{urlencode(params)}",
             status_code=200,
             json=page,
         )
         manager = JSONAPIManager(Dummy)
         list(manager.iterator())
-    assert cache.get('jsonapi:tests:42').field == 'Included Record'
+    assert cache.get("jsonapi:tests:42").field == "Included Record"
 
 
 def test_jsonapi_manager_all(pages):
@@ -149,23 +140,23 @@ def test_jsonapi_manager_all(pages):
 
 def test_jsonapi_manager_count():
     params = {
-        'page[size]': 1,
-        'filter[key]': 'value',
+        "page[size]": 1,
+        "filter[key]": "value",
     }
     with Mocker() as mocker:
-        url = f'http://test/api/tests/?{urlencode(params)}'
+        url = f"http://test/api/tests/?{urlencode(params)}"
         mocker.register_uri(
-            'GET',
+            "GET",
             url,
             status_code=200,
             json={
-                'meta': {
-                    'record_count': 137,
+                "meta": {
+                    "record_count": 137,
                 }
             },
         )
         manager = JSONAPIManager(Dummy)
-        assert manager.filter(key='value').count() == 137
+        assert manager.filter(key="value").count() == 137
 
 
 def test_jsonapi_manager_getitem(pages):
@@ -182,28 +173,24 @@ def test_jsonapi_manager_iter(pages):
 def test_jsonapi_manager_get():
     cache.clear()
     document = {
-        'data': {
-            'id': '12',
-            'type': 'tests',
-            'attributes': {}
-        },
-        'included': [
+        "data": {"id": "12", "type": "tests", "attributes": {}},
+        "included": [
             {
-                'id': '137',
-                'type': 'tests',
-                'attributes': {'field': 'Included Record'},
+                "id": "137",
+                "type": "tests",
+                "attributes": {"field": "Included Record"},
             }
-        ]
+        ],
     }
 
     with Mocker() as mocker:
         params = {
-            'fields[tests]': 'field,related',
-            'include': 'related',
+            "fields[tests]": "field,related",
+            "include": "related",
         }
-        url = f'http://test/api/tests/12/?{urlencode(params)}'
+        url = f"http://test/api/tests/12/?{urlencode(params)}"
         mocker.register_uri(
-            'GET',
+            "GET",
             url,
             status_code=200,
             json=document,
@@ -215,7 +202,7 @@ def test_jsonapi_manager_get():
         assert mocker.called
         assert mocker.last_request.url == url
         # Loads included in cache
-        assert cache.get('jsonapi:tests:137').field == 'Included Record'
+        assert cache.get("jsonapi:tests:137").field == "Included Record"
         # Uses cache
         mocker.reset_mock()
         assert manager.get(pk=12) == record

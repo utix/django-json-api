@@ -21,7 +21,7 @@ commands:
     steps:
       - restore_cache:
           keys:
-            - v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_test.txt" }}
+            - v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
             - v{{ .Environment.CACHE_VERSION }}-python-dependencies-
 
 jobs:
@@ -47,11 +47,11 @@ jobs:
           name: Install Dependencies
           command: |
             pip install -r requirements.txt
-            pip install -r requirements_test.txt
+            pip install -r requirements_dev.txt
       - save_cache:
           paths:
             - ./.venv
-          key: v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_test.txt" }}
+          key: v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
   run_python_tests:
     docker:
       - image: circleci/python:3.8
@@ -65,6 +65,29 @@ jobs:
       - run:
           name: Run Python Test Suite
           command: python -m pytest
+  run_python_formatter:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Run black check
+          command: python -m black . --check
+  run_python_linter:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Run flake8 check
+          command: flake8 -v ./
+
 
 workflows:
   build_and_test:
@@ -74,5 +97,11 @@ workflows:
           requires:
             - build
       - run_python_tests:
+          requires:
+            - install_python_deps
+      - run_python_formatter:
+          requires:
+            - install_python_deps
+      - run_python_linter:
           requires:
             - install_python_deps

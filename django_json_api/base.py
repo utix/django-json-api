@@ -13,11 +13,11 @@ class JSONAPIModelBase(type):
         parents = [b for b in bases if isinstance(b, JSONAPIModelBase)]
         if not parents:
             return super_new(cls, name, bases, attrs)
-        meta = attrs.pop('Meta')
+        meta = attrs.pop("Meta")
         new_attrs = {}
         contributable_attrs = {}
         for obj_name, obj in list(attrs.items()):
-            if hasattr(obj, 'contribute_to_class'):
+            if hasattr(obj, "contribute_to_class"):
                 contributable_attrs[obj_name] = obj
             else:
                 new_attrs[obj_name] = obj
@@ -28,6 +28,7 @@ class JSONAPIModelBase(type):
 
         class JSONAPIMeta:
             resource_name = new_class._meta.resource_type
+
         new_class.JSONAPIMeta = JSONAPIMeta
 
         for obj_name, obj in contributable_attrs.items():

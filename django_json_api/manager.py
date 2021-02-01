@@ -8,25 +8,25 @@ class JSONAPIManager:
     def __init__(self, model, **kwargs):
         self.client = JSONAPIClient()
         self.model = model
-        self._fields = kwargs.get('fields', {})
-        self._include = kwargs.get('include', [])
-        self._filters = kwargs.get('filters', {})
-        self._sort = kwargs.get('sort', [])
+        self._fields = kwargs.get("fields", {})
+        self._include = kwargs.get("include", [])
+        self._filters = kwargs.get("filters", {})
+        self._sort = kwargs.get("sort", [])
         self._cache = None
 
-    def modify(self, **kwargs) -> 'JSONAPIManager':
+    def modify(self, **kwargs) -> "JSONAPIManager":
         _fields = {
             **self._fields,
-            **kwargs.get('fields', {}),
+            **kwargs.get("fields", {}),
         }
         _filters = {
             **self._filters,
-            **kwargs.get('filters', {}),
+            **kwargs.get("filters", {}),
         }
         _include = deepcopy(self._include)
-        _include.extend(list(kwargs.get('include', [])))
+        _include.extend(list(kwargs.get("include", [])))
         _sort = deepcopy(self._sort)
-        _sort.extend(list(kwargs.get('sort', [])))
+        _sort.extend(list(kwargs.get("sort", [])))
         return JSONAPIManager(
             model=self.model,
             fields=_fields,
@@ -35,16 +35,16 @@ class JSONAPIManager:
             sort=_sort,
         )
 
-    def sort(self, *args) -> 'JSONAPIManager':
+    def sort(self, *args) -> "JSONAPIManager":
         return self.modify(sort=args)
 
-    def filter(self, **kwargs) -> 'JSONAPIManager':
+    def filter(self, **kwargs) -> "JSONAPIManager":
         return self.modify(filters=kwargs)
 
-    def include(self, *args) -> 'JSONAPIManager':
+    def include(self, *args) -> "JSONAPIManager":
         return self.modify(include=args)
 
-    def fields(self, **kwargs) -> 'JSONAPIManager':
+    def fields(self, **kwargs) -> "JSONAPIManager":
         return self.modify(fields=kwargs)
 
     @property
@@ -58,12 +58,13 @@ class JSONAPIManager:
             filters=self._filters,
             include=self._include or None,
             fields=self._fields,
-            sort=self._sort)
+            sort=self._sort,
+        )
 
     def _fetch_iterate(self) -> Iterator:
         client = JSONAPIClient()
-        client.session.headers['X-No-Count'] = 'true'
-        page_size = getattr(self.model._meta, 'page_size', 50)
+        client.session.headers["X-No-Count"] = "true"
+        page_size = getattr(self.model._meta, "page_size", 50)
         page_number = 1
         while True:
             page = client.get(
@@ -73,17 +74,18 @@ class JSONAPIManager:
                 fields=self._fields,
                 sort=self._sort,
                 page_size=page_size,
-                page_number=page_number)
-            included = page.get('included') or []
-            data = page.get('data')
+                page_number=page_number,
+            )
+            included = page.get("included") or []
+            data = page.get("data")
             page_number += 1
             self.model.from_resources(included)
             yield from self.model.from_resources(data)
-            next_url = page.get('links', {}).get('next')
+            next_url = page.get("links", {}).get("next")
             if next_url is None:
                 break
 
-    def _fetch_all(self) -> List['JSONAPIModel']:
+    def _fetch_all(self) -> List["JSONAPIModel"]:  # noqa
         if self._cache is None:
             self._cache = list(self._fetch_iterate())
         return self._cache
@@ -94,28 +96,29 @@ class JSONAPIManager:
             include=[],
             fields={self.resource_type: []},
             filters=self._filters,
-            page_size=1)
-        return data.get('meta', {}).get('record_count')
+            page_size=1,
+        )
+        return data.get("meta", {}).get("record_count")
 
-    def iterator(self) -> Iterator['JSONAPIModel']:
+    def iterator(self) -> Iterator["JSONAPIModel"]:  # noqa
         return self._fetch_iterate()
 
-    def all(self) -> List['JSONAPIModel']:
+    def all(self) -> List["JSONAPIModel"]:  # noqa
         return self._fetch_all()
 
-    def get(self, pk, ignore_cache=False) -> 'JSONAPIModel':
+    def get(self, pk, ignore_cache=False) -> "JSONAPIModel":  # noqa
         record = self.model.from_cache(pk)
         if record is None or ignore_cache:
             document = self._fetch_get(resource_id=pk)
-            data = document['data']
+            data = document["data"]
             record = self.model.from_resource(data)
-            self.model.from_resources(document.get('included') or [])
+            self.model.from_resources(document.get("included") or [])
         return record
 
-    def __getitem__(self, k) -> 'JSONAPIModel':
+    def __getitem__(self, k) -> "JSONAPIModel":  # noqa
         self._fetch_all()
         return self._cache[k]
 
-    def __iter__(self) -> Iterator['JSONAPIModel']:
+    def __iter__(self) -> Iterator["JSONAPIModel"]:  # noqa
         self._fetch_all()
         return iter(self._cache)

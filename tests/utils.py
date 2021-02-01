@@ -2,9 +2,7 @@ from unittest import mock
 
 
 def mock_json_api(target):
-    target.patcher = mock.patch(
-        'django_json_api.manager.JSONAPIManager',
-        spec=True)
+    target.patcher = mock.patch("django_json_api.manager.JSONAPIManager", spec=True)
 
     setup_fn = target.setUp
     teardown_fn = target.tearDown
@@ -15,7 +13,7 @@ def mock_json_api(target):
 
     def decorated_teardown(instance):
         instance.patcher.stop()
-        delattr(instance, 'manager')
+        delattr(instance, "manager")
         return teardown_fn(instance)
 
     target.setUp = decorated_setup

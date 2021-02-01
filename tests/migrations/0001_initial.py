@@ -9,19 +9,30 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='DummyModel',
+            name="DummyModel",
             fields=[
-                ('id', models.AutoField(auto_created=True,
-                                        primary_key=True, serialize=False, verbose_name='ID')),
-                ('related', django_json_api.django.RelatedJSONAPIField(
-                    json_api_model=tests.models.DummyRelated)),
-                ('other', django_json_api.django.RelatedJSONAPIField(
-                    json_api_model=tests.models.DummyRelated, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "related",
+                    django_json_api.django.RelatedJSONAPIField(
+                        json_api_model=tests.models.DummyRelated
+                    ),
+                ),
+                (
+                    "other",
+                    django_json_api.django.RelatedJSONAPIField(
+                        json_api_model=tests.models.DummyRelated, null=True
+                    ),
+                ),
             ],
         ),
     ]
