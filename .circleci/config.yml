@@ -21,7 +21,7 @@ commands:
     steps:
       - restore_cache:
           keys:
-            - v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_test.txt" }}
+            - v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
             - v{{ .Environment.CACHE_VERSION }}-python-dependencies-
 
 jobs:
@@ -47,11 +47,11 @@ jobs:
           name: Install Dependencies
           command: |
             pip install -r requirements.txt
-            pip install -r requirements_test.txt
+            pip install -r requirements_dev.txt
       - save_cache:
           paths:
             - ./.venv
-          key: v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_test.txt" }}
+          key: v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
   run_python_tests:
     docker:
       - image: circleci/python:3.8
