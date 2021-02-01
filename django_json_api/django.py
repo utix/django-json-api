@@ -5,7 +5,7 @@ from django.db.models.fields import IntegerField
 from django.db.models import Manager, QuerySet, Model
 
 
-__all__ = ('RelatedJSONAPIField', )
+__all__ = ("RelatedJSONAPIField",)
 
 
 class RelatedJSONAPIDescriptor:
@@ -16,7 +16,7 @@ class RelatedJSONAPIDescriptor:
         if instance is None:
             return self
 
-        cached = getattr(instance, f'_cache_{self.field.name}', None)
+        cached = getattr(instance, f"_cache_{self.field.name}", None)
         if cached:
             return cached
 
@@ -26,14 +26,14 @@ class RelatedJSONAPIDescriptor:
             return None
 
         value = _model.objects.get(pk=_pk)
-        setattr(instance, f'_cache_{self.field.name}', value)
+        setattr(instance, f"_cache_{self.field.name}", value)
         return value
 
     def __set__(self, instance, value):
         if value is not None:
             if not isinstance(value, self.field.json_api_model):
                 raise ValueError(
-                    'Cannot assign {}: {}.{} must be a {} instance'.format(
+                    "Cannot assign {}: {}.{} must be a {} instance".format(
                         value,
                         instance._meta.object_name,
                         self.field.name,
@@ -42,7 +42,7 @@ class RelatedJSONAPIDescriptor:
                 )
             if not value.pk:
                 raise ValueError(
-                    'Cannot assign {} without pk to {}.{}'.format(
+                    "Cannot assign {} without pk to {}.{}".format(
                         self.field.json_api_model.__name__,
                         instance._meta.object_name,
                         self.field.name,
@@ -52,23 +52,23 @@ class RelatedJSONAPIDescriptor:
         else:
             setattr(instance, self.field.get_attname(), None)
 
-        setattr(instance, f'_cache_{self.field.name}', value)
+        setattr(instance, f"_cache_{self.field.name}", value)
 
 
 class RelatedJSONAPIField(IntegerField):
-    description = 'Field for JSON API External Relations'
+    description = "Field for JSON API External Relations"
 
     def __init__(self, json_api_model=None, **kwargs):
-        kwargs.pop('rel', None)
+        kwargs.pop("rel", None)
         super().__init__(**kwargs)
         self.json_api_model = json_api_model
 
     @property
-    def validators(self):  # pylint: disable=invalid-overridden-method
+    def validators(self):
         return []
 
     def get_attname(self):
-        return f'{self.name}_id'
+        return f"{self.name}_id"
 
     def get_attname_column(self):
         attname = self.get_attname()
@@ -77,7 +77,7 @@ class RelatedJSONAPIField(IntegerField):
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
-        kwargs['json_api_model'] = self.json_api_model
+        kwargs["json_api_model"] = self.json_api_model
         return name, path, args, kwargs
 
     def contribute_to_class(self, cls, name, private_only=False):
@@ -91,12 +91,12 @@ class RelatedJSONAPIField(IntegerField):
 
 
 def get_jsonapi_id(source, path):
-    splitted_path = path.split('__')
+    splitted_path = path.split("__")
     attr = splitted_path[-1]
     current_source = source
     for relation in splitted_path[:-1]:
         current_source = getattr(current_source, relation)
-    return getattr(current_source, f'{attr}_id')
+    return getattr(current_source, f"{attr}_id")
 
 
 def prefetch_jsonapi(model_instances: List[Model], related_lookups: Dict):
@@ -117,14 +117,11 @@ def prefetch_jsonapi(model_instances: List[Model], related_lookups: Dict):
     for instance in model_instances:
         for attr, json_api_model in related_lookups.items():
             records = prefetched_data.get(json_api_model._meta.resource_type, {})
-            setattr(
-                instance,
-                f'_cache_{attr}',
-                records.get(get_jsonapi_id(instance, attr)))
+            setattr(instance, f"_cache_{attr}", records.get(get_jsonapi_id(instance, attr)))
 
 
 def model_from_related_path(model, path):
-    splitted_path = path.split('__')
+    splitted_path = path.split("__")
     current_model = model
     for relation in splitted_path[:-1]:
         current_model = current_model._meta.get_field(relation).related_model
@@ -139,17 +136,14 @@ class WithJSONApiQuerySet(QuerySet):
 
     def _clone(self):
         clone = super()._clone()
-        # pylint: disable=no-member,protected-access
         clone._prefetch_jsonapi_lookups = self._prefetch_jsonapi_lookups.copy()
         return clone
 
     def prefetch_jsonapi(self, *lookups):
         clone = self._clone()
-        # pylint: disable=no-member,protected-access
-        clone._prefetch_jsonapi_lookups.update({
-            related: model_from_related_path(self.model, related)
-            for related in lookups
-        })
+        clone._prefetch_jsonapi_lookups.update(
+            {related: model_from_related_path(self.model, related) for related in lookups}
+        )
         return clone
 
     def _do_prefetch_jsonapi(self):
@@ -162,5 +156,4 @@ class WithJSONApiQuerySet(QuerySet):
             self._do_prefetch_jsonapi()
 
 
-# pylint: disable=invalid-name
 WithJSONApiManager = Manager.from_queryset(WithJSONApiQuerySet)

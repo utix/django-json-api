@@ -29,16 +29,13 @@ class RelatedJSONAPIFieldTestCase(TestCase):
 
     def test_assign_to_bad_type_value(self):
         record = DummyModel()
-        expected = (
-            'Cannot assign 42: '
-            'DummyModel.related must be a DummyRelated instance'
-        )
+        expected = "Cannot assign 42: " "DummyModel.related must be a DummyRelated instance"
         with self.assertRaisesMessage(ValueError, expected):
             record.related = 42
 
     def test_assign_to_value_without_pk(self):
         record = DummyModel()
-        expected = 'Cannot assign DummyRelated without pk to DummyModel.related'
+        expected = "Cannot assign DummyRelated without pk to DummyModel.related"
         with self.assertRaisesMessage(ValueError, expected):
             record.related = DummyRelated()
 
@@ -50,7 +47,6 @@ class RelatedJSONAPIFieldTestCase(TestCase):
 
 @pytest.mark.django_db
 def test_prefetch_jsonapi():
-    # pylint: disable=no-member,protected-access
     _get_many = DummyRelated.get_many
     DummyRelated.get_many = mock.Mock()
     DummyRelated.get_many.return_value = {
@@ -62,7 +58,7 @@ def test_prefetch_jsonapi():
         DummyModel(pk=12, related_id=137, other_id=12),
         DummyModel(pk=13, related_id=42, other_id=None),
     ]
-    prefetch_jsonapi(instances, {'other': DummyRelated, 'related': DummyRelated})
+    prefetch_jsonapi(instances, {"other": DummyRelated, "related": DummyRelated})
     assert instances[0]._cache_other == DummyRelated(pk=12)
     assert instances[0]._cache_related == DummyRelated(pk=137)
     assert instances[1]._cache_other is None
@@ -73,17 +69,17 @@ def test_prefetch_jsonapi():
 
 @pytest.mark.django_db
 def test_with_jsonapi_manager():
-    with mock.patch('django_json_api.django.prefetch_jsonapi') as prefetch_jsonapi_mock:
+    with mock.patch("django_json_api.django.prefetch_jsonapi") as prefetch_jsonapi_mock:
         related = DummyRelated(pk=12).cache()
         instance = DummyModel.objects.create(pk=42, related=related)
         manager = WithJSONApiManager()
         manager.model = DummyModel
-        qset = manager.filter(id__gt=12).prefetch_jsonapi(
-            'related').prefetch_jsonapi('other').all()
+        qset = manager.filter(id__gt=12).prefetch_jsonapi("related").prefetch_jsonapi("other").all()
         assert list(qset) == [instance]
         prefetch_jsonapi_mock.assert_called_once_with(
             [instance],
             {
-                'related': DummyRelated,
-                'other': DummyRelated,
-            })
+                "related": DummyRelated,
+                "other": DummyRelated,
+            },
+        )
