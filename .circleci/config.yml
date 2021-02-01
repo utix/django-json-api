@@ -1,0 +1,78 @@
+version: 2.1
+
+commands:
+  restore_repository:
+    steps:
+      - restore_cache:
+          keys:
+            - v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+  activate_virtualenv:
+    steps:
+      - run:
+          name: Create Virtual Env
+          command: virtualenv --python python3.8 ~/django_json_api/.venv
+      - run:
+          name: Activate Env
+          command: source ~/django_json_api/.venv/bin/activate
+      - run:
+          name: Add Activate Command to .bashrc
+          command: echo "source ~/django_json_api/.venv/bin/activate" >> $BASH_ENV
+  restore_virtualenv:
+    steps:
+      - restore_cache:
+          keys:
+            - v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_test.txt" }}
+            - v{{ .Environment.CACHE_VERSION }}-python-dependencies-
+
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - checkout
+      - save_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+          paths:
+            - ~/django_json_api
+  install_python_deps:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Install Dependencies
+          command: |
+            pip install -r requirements.txt
+            pip install -r requirements_test.txt
+      - save_cache:
+          paths:
+            - ./.venv
+          key: v{{ .Environment.CACHE_VERSION }}-python-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements_test.txt" }}
+  run_python_tests:
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          DJANGO_DEBUG: 1
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Run Python Test Suite
+          command: python -m pytest
+
+workflows:
+  build_and_test:
+    jobs:
+      - build
+      - install_python_deps:
+          requires:
+            - build
+      - run_python_tests:
+          requires:
+            - install_python_deps
