@@ -2,16 +2,14 @@ from datetime import datetime, timezone
 from unittest import mock
 
 from django_json_api.fields import (
-    get_model,
-    is_identifier,
     Attribute,
     AttributeDescriptor,
     DateTimeAttribute,
     Relationship,
     RelationshipDescriptor,
+    get_model,
+    is_identifier,
 )
-
-
 from tests.models import Dummy, DummyRelated
 
 

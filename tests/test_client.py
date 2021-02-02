@@ -1,7 +1,7 @@
 from urllib.parse import urlencode
 
-import requests_mock
 import pytest
+import requests_mock
 
 from django_json_api.client import JSONAPIClient, JSONAPIClientError
 

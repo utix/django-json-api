@@ -1,9 +1,8 @@
-from unittest import mock, TestCase
+from unittest import TestCase, mock
 
 from django.core.cache import cache
 
 from django_json_api.models import JSONAPIModel
-
 from tests.models import Dummy
 
 

@@ -2,10 +2,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_404_NOT_FOUND
 from rest_framework_json_api import serializers
 from rest_framework_json_api.relations import ResourceRelatedField
-from rest_framework_json_api.utils import (
-    get_included_resources,
-    get_resource_type_from_serializer,
-)
+from rest_framework_json_api.utils import get_included_resources, get_resource_type_from_serializer
 
 from django_json_api import django, fields
 from django_json_api.client import JSONAPIClientError
