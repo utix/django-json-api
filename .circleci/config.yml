@@ -87,6 +87,17 @@ jobs:
       - run:
           name: Run flake8 check
           command: flake8 -v ./
+  run_python_import_sorter:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/django_json_api
+    steps:
+      - restore_repository
+      - restore_virtualenv
+      - activate_virtualenv
+      - run:
+          name: Run isort check
+          command: python -m isort django_json_api/ tests/ --check -v
 
 
 workflows:
@@ -103,5 +114,8 @@ workflows:
           requires:
             - install_python_deps
       - run_python_linter:
+          requires:
+            - install_python_deps
+      - run_python_import_sorter:
           requires:
             - install_python_deps
