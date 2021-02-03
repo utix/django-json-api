@@ -2,11 +2,9 @@ from typing import Dict, List, Optional, Union
 from urllib.parse import urlencode
 
 import requests
-
 from django.conf import settings
 
-from django_json_api.fields import get_model, Relationship
-
+from django_json_api.fields import Relationship, get_model
 
 Fields = Dict[str, List[str]]
 Include = List[str]

@@ -1,14 +1,11 @@
 from urllib.parse import urlencode
 
-from requests_mock.mocker import Mocker
 import pytest
-
 from django.core.cache import cache
+from requests_mock.mocker import Mocker
 
 from django_json_api.manager import JSONAPIManager
-
 from tests.models import Dummy
-
 
 PAGES = [
     {

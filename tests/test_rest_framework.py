@@ -1,12 +1,12 @@
 from unittest import mock
 
+from django.test import TestCase
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import BaseSerializer
 from rest_framework_json_api.utils import get_included_serializers
-from django.test import TestCase
 
-from django_json_api.rest_framework import ModelSerializer, get_default_relation_serializer
 from django_json_api.client import JSONAPIClientError
+from django_json_api.rest_framework import ModelSerializer, get_default_relation_serializer
 from tests.models import DummyModel, DummyRelated
 
 

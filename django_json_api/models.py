@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, List, Dict, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type, Union
 
 from django.core.cache import cache
 

@@ -1,11 +1,9 @@
 from unittest import mock
 
 import pytest
-
 from django.test import TestCase
 
-from django_json_api.django import prefetch_jsonapi, WithJSONApiManager
-
+from django_json_api.django import WithJSONApiManager, prefetch_jsonapi
 from tests.models import DummyModel, DummyRelated
 
 

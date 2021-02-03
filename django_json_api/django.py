@@ -1,9 +1,8 @@
 from collections import defaultdict
-from typing import List, Dict
+from typing import Dict, List
 
+from django.db.models import Manager, Model, QuerySet
 from django.db.models.fields import IntegerField
-from django.db.models import Manager, QuerySet, Model
-
 
 __all__ = ("RelatedJSONAPIField",)
 
