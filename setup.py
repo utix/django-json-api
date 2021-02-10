@@ -26,7 +26,7 @@ setup(
     install_requires=core_deps,
     long_description=long_description,
     long_description_content_type="text/markdown",
-    name="django-json-api-share-work",
+    name="django-json-api",
     packages=find_packages(),
     python_requires=">=3.8",
     url="https://github.com/share-work/django-json-api",
