@@ -1,0 +1,7 @@
+[run]
+branch = True
+concurrency = multiprocessing
+include = */django-json-api/*
+parallel = True
+plugins = django_coverage_plugin
+source = django_json_api

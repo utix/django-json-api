@@ -1,0 +1,33 @@
+codecov:
+  require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  range: "90...100"
+  project:
+    default:
+      target: 95
+      base: auto
+      if_no_uploads: error
+      if_not_found: failure
+      if_ci_failed: error
+      only_pulls: true
+
+status:
+    project: yes
+    patch: yes
+    changes: no
+
+parsers:
+  gcov:
+    branch_detection:
+      conditional: yes
+      loop: yes
+      method: no
+      macro: no
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+  require_changes: no
