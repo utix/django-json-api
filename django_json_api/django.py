@@ -1,10 +1,12 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Optional, Type
 
 from django.db.models import Manager, Model, QuerySet
 from django.db.models.fields import IntegerField
 
 __all__ = ("RelatedJSONAPIField",)
+
+from django_json_api.models import JSONAPIModel
 
 
 class RelatedJSONAPIDescriptor:
@@ -57,7 +59,9 @@ class RelatedJSONAPIDescriptor:
 class RelatedJSONAPIField(IntegerField):
     description = "Field for JSON API External Relations"
 
-    def __init__(self, json_api_model=None, **kwargs):
+    def __init__(
+        self: "RelatedJSONAPIField", json_api_model: Optional[Type[JSONAPIModel]] = None, **kwargs
+    ):
         kwargs.pop("rel", None)
         super().__init__(**kwargs)
         self.json_api_model = json_api_model

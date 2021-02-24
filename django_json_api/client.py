@@ -24,10 +24,9 @@ class JSONAPIClient:
         self.session = requests.Session()
         self.session.headers.update(
             {
-                "User-Agent": f"SW_{settings.SERVICE}/JsonAPI",
                 "Content-Type": "application/vnd.api+json",
                 "Accept": "application/vnd.api+json",
-                "X-SW-service": settings.SERVICE,
+                **getattr(settings, "DJANGO_JSON_API_ADDITIONAL_HEADERS", {}),
             }
         )
 
