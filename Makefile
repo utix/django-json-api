@@ -7,7 +7,7 @@
 # make build     # Build the package
 
 SHELL := /bin/bash
-.PHONY: clean build
+.PHONY: clean lint test test-cov build
 
 .venv: .venv/touchfile
 
