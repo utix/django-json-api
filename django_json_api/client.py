@@ -4,6 +4,7 @@ from urllib.parse import urlencode
 import requests
 from django.conf import settings
 
+from django_json_api import __version__
 from django_json_api.fields import Relationship, get_model
 
 Fields = Dict[str, List[str]]
@@ -26,6 +27,7 @@ class JSONAPIClient:
             {
                 "Content-Type": "application/vnd.api+json",
                 "Accept": "application/vnd.api+json",
+                "User-Agent": f"JSONAPIClient/{__version__}",
                 **getattr(settings, "DJANGO_JSON_API_ADDITIONAL_HEADERS", {}),
             }
         )
