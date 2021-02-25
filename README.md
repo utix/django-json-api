@@ -32,6 +32,8 @@ pip install -e .
 Suppose you have a `django.db.models.Model` class inside microservice A, such as:
 
 ```python
+from django.db import models
+
 class Company(models.Model):
     name = models.CharField(max_length=256)
     domain = models.CharField(max_length=256)
@@ -50,6 +52,9 @@ definition:
 and define an instance of a `django_json_api.models.JSONAPIModel` inside microservice B:
 
 ```python
+from django_json_api.models import JSONAPIModel
+from django_json_api.fields import Attribute
+
 class Company(JSONAPIModel):
     class Meta:
         api_url = MICROSERVICE_A_API_URL
@@ -59,6 +64,8 @@ class Company(JSONAPIModel):
     domain = Attribute()
 ```
 
+PS: `api_url` expects a url with protocol (i.e. starting with `http(s)://`) and ending with a trailing slash `/`.
+
 Now, querying companies from microservice B is as easy as:
 
 ```python
@@ -67,6 +74,32 @@ Now, querying companies from microservice B is as easy as:
   Company.objects.iterator()
   ...
 ```
+
+You can also have entities in one microservice relate to entities in another by leveraging both `RelatedJSONAPIField`
+and `WithJSONAPIQuerySet`. Take a look at this model definition from microservice B:
+
+```python
+from django.db import models
+from django_json_api.django import RelatedJSONAPIField
+
+
+class User(models.Model):
+    name = models.CharField(max_length=256)
+    company = RelatedJSONAPIField(json_api_model=Company)
+    deleted_at = models.DateTimeField(null=True, default=None)
+```
+
+Here, `Company` is the `JSONAPIModel` defined above. This makes it possible, when querying for a user, to also
+fetch its related company:
+
+```python
+user = User.objects.get(pk=1)
+user.company # This will be resolved through an underlying HTTP request
+```
+
+In case of larger querysets, you might want to prefetch the relations as you do with django's `prefetch_related`. For
+that, you imbue `User`'s manager using `WithJSONApiQuerySet`, which will grant the manager a new
+method: `prefetch_jsonapi`.
 
 
 ## License
