@@ -1,9 +1,11 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Type, Union
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 
 from django.core.cache import cache
 
 from django_json_api.base import JSONAPIModelBase
+
+T = TypeVar("T", bound="JSONAPIModel")
 
 
 def _find_model_class(resource_type: str) -> Type:
@@ -14,7 +16,7 @@ def _find_model_class(resource_type: str) -> Type:
 
 
 class JSONAPIModel(metaclass=JSONAPIModelBase):
-    def __init__(self, **kwargs):
+    def __init__(self: T, **kwargs: int) -> None:
         self.pk = kwargs.pop("pk", None) or kwargs.pop("id", None)
         if self.pk is not None:
             self.pk = int(self.pk)
@@ -26,7 +28,7 @@ class JSONAPIModel(metaclass=JSONAPIModelBase):
             setattr(self, key, value)
         super().__init__()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self: T, other: Any) -> bool:
         if self.__class__ != other.__class__:
             return False
         my_pk = self.pk
@@ -35,11 +37,11 @@ class JSONAPIModel(metaclass=JSONAPIModelBase):
         return int(my_pk) == int(other.pk)
 
     @property
-    def id(self) -> int:
+    def id(self: T) -> int:
         return self.pk
 
     @staticmethod
-    def from_resource(resource_dict: dict, persist: Optional[bool] = True) -> "JSONAPIModel":
+    def from_resource(resource_dict: dict, persist: Optional[bool] = True) -> T:
         cls = _find_model_class(resource_dict["type"])
         if cls:
             kwargs = {}
@@ -67,7 +69,7 @@ class JSONAPIModel(metaclass=JSONAPIModelBase):
         return None
 
     @staticmethod
-    def from_resources(resource_dicts: List[Dict]) -> List["JSONAPIModel"]:
+    def from_resources(resource_dicts: List[Dict]) -> List[T]:
         grouped_records = defaultdict(list)
         for record in resource_dicts:
             grouped_records[record["type"]].append(record)
@@ -82,16 +84,16 @@ class JSONAPIModel(metaclass=JSONAPIModelBase):
         return records
 
     @classmethod
-    def cache_key(cls, pk: Union[str, int]) -> str:
+    def cache_key(cls: Type[T], pk: Union[str, int]) -> str:
         resource_type = cls._meta.resource_type
         return f"jsonapi:{resource_type}:{pk}"
 
     @classmethod
-    def from_cache(cls, pk: Union[str, int]) -> "JSONAPIModel":
+    def from_cache(cls: Type[T], pk: Union[str, int]) -> T:
         return cache.get(cls.cache_key(pk))
 
     @classmethod
-    def get_many(cls, record_ids: List[Union[str, int]]) -> Dict:
+    def get_many(cls: Type[T], record_ids: List[Union[str, int]]) -> Dict:
         cache_keys = [cls.cache_key(pk) for pk in record_ids]
         records = {record.id: record for record in cache.get_many(cache_keys).values()}
         missing = set(map(int, filter(bool, record_ids))) - set(records)
@@ -105,7 +107,7 @@ class JSONAPIModel(metaclass=JSONAPIModelBase):
                     records[missing_id] = cls.objects.get(pk=missing_id)
         return records
 
-    def cache(self) -> "JSONAPIModel":
+    def cache(self: T) -> T:
         cache_expiration = getattr(self._meta, "cache_expiration", 24 * 60 * 60)
         cache.set(
             self.cache_key(self.pk),
@@ -115,14 +117,14 @@ class JSONAPIModel(metaclass=JSONAPIModelBase):
         return self
 
     @classmethod
-    def cache_many(cls, instances: List["JSONAPIModel"]) -> List["JSONAPIModel"]:
+    def cache_many(cls: Type[T], instances: List[T]) -> List[T]:
         cache_expiration = getattr(cls._meta, "cache_expiration", 24 * 60 * 60)
         cache.set_many(
             {instance.cache_key(instance.pk): instance for instance in instances}, cache_expiration
         )
         return instances
 
-    def refresh_from_api(self) -> None:
+    def refresh_from_api(self: T) -> None:
         fresh = self.objects.get(pk=self.pk, ignore_cache=True)
         self.__dict__ = fresh.__dict__
         self.cache()

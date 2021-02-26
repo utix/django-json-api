@@ -2,6 +2,8 @@ from urllib.parse import urlencode
 
 import pytest
 import requests_mock
+from django.conf import settings
+from django.test import override_settings
 
 from django_json_api.client import JSONAPIClient, JSONAPIClientError
 
@@ -12,12 +14,28 @@ def mock_requests():
         yield mocker
 
 
+@override_settings(DJANGO_JSON_API_ADDITIONAL_HEADERS={})
 def test_jsonapi_client_session_headers():
+    del settings.DJANGO_JSON_API_ADDITIONAL_HEADERS
     client = JSONAPIClient()
     assert client.session.headers["Accept"] == "application/vnd.api+json"
     assert client.session.headers["Content-Type"] == "application/vnd.api+json"
-    assert client.session.headers["X-SW-service"] == "test"
+    assert client.session.headers["User-Agent"] == "JSONAPIClient/0.1.0"
+
+    setattr(
+        settings,
+        "DJANGO_JSON_API_ADDITIONAL_HEADERS",
+        {
+            "User-Agent": f"SW_{settings.SERVICE}/JsonAPI",
+            "X-SW-service": settings.SERVICE,
+        },
+    )
+
+    client = JSONAPIClient()
+    assert client.session.headers["Accept"] == "application/vnd.api+json"
+    assert client.session.headers["Content-Type"] == "application/vnd.api+json"
     assert client.session.headers["User-Agent"] == "SW_test/JsonAPI"
+    assert client.session.headers["X-SW-service"] == "test"
 
 
 def test_jsonapi_client_get_list_default(mock_requests):

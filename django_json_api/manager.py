@@ -122,3 +122,7 @@ class JSONAPIManager:
     def __iter__(self) -> Iterator["JSONAPIModel"]:  # noqa
         self._fetch_all()
         return iter(self._cache)
+
+    def __bool__(self: "JSONAPIManager") -> bool:
+        self._fetch_all()
+        return bool(self._cache)

@@ -44,6 +44,30 @@ def pages():
         yield mocker
 
 
+@pytest.fixture
+def empty_page():
+    page = {
+        "data": [],
+        "meta": {"record_count": 0},
+        "links": {"first": "first", "last": "last"},
+    }
+
+    with Mocker() as mocker:
+        params = {
+            "include": "related",
+            "fields[tests]": "field,related",
+            "page[size]": 10,
+            "page[number]": 1,
+        }
+        mocker.register_uri(
+            "GET",
+            f"http://test/api/tests/?{urlencode(params)}",
+            status_code=200,
+            json=page,
+        )
+        yield mocker
+
+
 def test_jsonapi_manager_sort():
     manager = JSONAPIManager(Dummy)
     manager_with_sort = manager.sort("field1", "field2")
@@ -165,6 +189,20 @@ def test_jsonapi_manager_iter(pages):
     manager = JSONAPIManager(Dummy)
     assert len(list(iter(manager))) == 50
     assert manager._cache
+
+
+def test_jsonapi_manager_bool_true(pages):
+    manager = JSONAPIManager(Dummy)
+    result = bool(manager)
+    expected = True
+    assert result is expected
+
+
+def test_jsonapi_manager_bool_false(empty_page):
+    manager = JSONAPIManager(Dummy)
+    result = bool(manager)
+    expected = False
+    assert result is expected
 
 
 def test_jsonapi_manager_get():
