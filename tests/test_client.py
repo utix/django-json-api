@@ -20,7 +20,7 @@ def test_jsonapi_client_session_headers():
     client = JSONAPIClient()
     assert client.session.headers["Accept"] == "application/vnd.api+json"
     assert client.session.headers["Content-Type"] == "application/vnd.api+json"
-    assert client.session.headers["User-Agent"] == "JSONAPIClient/0.1.0"
+    assert client.session.headers["User-Agent"] == "JSONAPIClient/0.1.1"
 
     setattr(
         settings,
