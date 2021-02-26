@@ -21,12 +21,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     author="Sharework",
+    author_email="root@sharework.co",
     description="JSON API specification for Django services",
     extras_require={"all": dev_deps, "dev": dev_deps},
     install_requires=core_deps,
     long_description=long_description,
     long_description_content_type="text/markdown",
     name="django-json-api",
+    package_data={"django_json_api": ["resources/VERSION"]},
     packages=find_packages(),
     python_requires=">=3.8",
     url="https://github.com/share-work/django-json-api",
